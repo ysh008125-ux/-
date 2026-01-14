@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>수2 미분 마스터 게임</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background: #1a1a2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-box {
+            background: #16213e;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 450px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #4ecca3;
+        }
+
+        #question-area {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        #derivative {
+            font-size: 1.8rem;
+            margin: 10px 0;
+            color: #e94560;
+            font-weight: bold;
+        }
+
+        .condition {
+            font-size: 1.2rem;
+            color: #fff;
+            background: #533483;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .btn-up {
+            background: #4ecca3;
+            color: #1a1a2e;
+        }
+
+        .btn-down {
+            background: #e94560;
+            color: white;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #timer-bar {
+            width: 100%;
+            height: 5px;
+            background: #eee;
+            margin-top: 15px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        #timer-fill {
+            width: 100%;
+            height: 100%;
+            background: #4ecca3;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html"
+        style="position:fixed; top:20px; left:20px; color:white; text-decoration:none; background:rgba(255,255,255,0.2); padding:8px 16px; border-radius:20px; font-weight:bold; z-index:999;">🏠
+        HOME</a>
+
+    <div id="game-box">
+        <div class="stats">
+            <span>점수: <span id="score">0</span></span>
+            <span>최고 기록: <span id="high-score">0</span></span>
+        </div>
+
+        <div id="question-area">
+            <p style="margin:0; color:#aaa;">도함수 f'(x)가 다음과 같을 때</p>
+            <div id="derivative">f'(x) = 2x - 4</div>
+            <div class="condition">x = 3 일 때 f(x)는?</div>
+        </div>
+
+        <div class="btn-container">
+            <button class="btn-up" onclick="answer('up')">증가 📈</button>
+            <button class="btn-down" onclick="answer('down')">감소 📉</button>
+        </div>
+
+        <div id="timer-bar">
+            <div id="timer-fill"></div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let highScore = 0;
+        let currentAns = "";
+        let timeLeft = 100;
+        let timerInterval;
+
+        function generateQuestion() {
+            const types = ['linear', 'quadratic'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            let xVal = Math.floor(Math.random() * 10) - 5; // -5 ~ 4
+            let derivativeText = "";
+            let fPrimeX = 0;
+
+            if (type === 'linear') {
+                let a = Math.floor(Math.random() * 4) + 1; // 1~4
+                let b = Math.floor(Math.random() * 10) - 5;
+                derivativeText = `f'(x) = ${a}x ${b >= 0 ? '+' : ''} ${b}`;
+                fPrimeX = a * xVal + b;
+            } else {
+                // f'(x) = (x-a)(x-b) 형태
+                let a = Math.floor(Math.random() * 4) - 2;
+                let b = Math.floor(Math.random() * 4) + 1;
+                derivativeText = `f'(x) = (x ${a >= 0 ? '-' : '+'} ${Math.abs(a)})(x ${b >= 0 ? '-' : '+'} ${Math.abs(b)})`;
+                fPrimeX = (xVal - a) * (xVal - b);
+            }
+
+            if (fPrimeX === 0) return generateQuestion(); // 0인 경우는 재추첨 (극점 제외)
+
+            document.getElementById('derivative').innerText = derivativeText;
+            document.querySelector('.condition').innerText = `x = ${xVal} 일 때 f(x)는?`;
+            currentAns = fPrimeX > 0 ? "up" : "down";
+            resetTimer();
+        }
+
+        function answer(choice) {
+            if (choice === currentAns) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                generateQuestion();
+            } else {
+                gameOver();
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 100;
+            timerInterval = setInterval(() => {
+                timeLeft -= 2;
+                document.getElementById('timer-fill').style.width = timeLeft + "%";
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    gameOver();
+                }
+            }, 100);
+        }
+
+        function gameOver() {
+            alert(`게임 오버! 최종 점수: ${score}`);
+            if (score > highScore) highScore = score;
+            document.getElementById('high-score').innerText = highScore;
+            score = 0;
+            document.getElementById('score').innerText = score;
+            generateQuestion();
+        }
+
+        generateQuestion();
+    </script>
+
+</body>
+
+</html>

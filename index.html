@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High School Math Universe</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="home.css">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="grid-overlay"></div>
+    </div>
+
+    <main class="dashboard-container">
+        <header class="main-header">
+            <h1 class="app-title">MATH<span class="highlight">OS</span></h1>
+            <p class="app-subtitle">Select your challenge module</p>
+        </header>
+
+        <div class="menu-grid">
+            <a href="susang.html" class="menu-card card-susang">
+                <div class="card-icon">📐</div>
+                <div class="card-content">
+                    <h2>수학 (상)</h2>
+                    <p>Basic Concepts & Algebra</p>
+                </div>
+                <div class="card-bg-text">01</div>
+            </a>
+
+            <a href="suone.html" class="menu-card card-suone">
+                <div class="card-icon">📈</div>
+                <div class="card-content">
+                    <h2>수학 I</h2>
+                    <p>Exponents & Logarithms</p>
+                </div>
+                <div class="card-bg-text">02</div>
+            </a>
+
+            <a href="sutwo.html" class="menu-card card-sutwo">
+                <div class="card-icon">🌀</div>
+                <div class="card-content">
+                    <h2>수학 II</h2>
+                    <p>Calculus Dimension</p>
+                </div>
+                <div class="card-bg-text">03</div>
+            </a>
+
+            <a href="tonggyeo.html" class="menu-card card-stats">
+                <div class="card-icon">🎲</div>
+                <div class="card-content">
+                    <h2>확률과 통계</h2>
+                    <p>Probability & Statistics</p>
+                </div>
+                <div class="card-bg-text">04</div>
+            </a>
+        </div>
+    </main>
+
+    <script>
+        // Add tilt effect to cards
+        const cards = document.querySelectorAll('.menu-card');
+
+        cards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                card.style.setProperty('--x', `${x}px`);
+                card.style.setProperty('--y', `${y}px`);
+            });
+        });
+    </script>
+</body>
+
+</html>

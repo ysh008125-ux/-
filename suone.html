@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>수1 지수함수 마스터</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        #game-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #formula {
+            font-size: 2.5rem;
+            margin: 20px 0;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border: 2px solid #007bff;
+            background: white;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        #score {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        #feedback {
+            height: 20px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html"
+        style="position:fixed; top:20px; left:20px; color:#333; text-decoration:none; background:rgba(0,0,0,0.1); padding:8px 16px; border-radius:20px; font-weight:bold; z-index:999;">🏠
+        HOME</a>
+
+    <div id="game-container">
+        <h1>📉 지수함수 개형 맞추기</h1>
+        <div id="score">점수: 0</div>
+        <div id="formula">y = a<sup>x</sup></div>
+        <p>위 함수의 그래프 모양은?</p>
+
+        <div class="options">
+            <button onclick="checkAnswer('increase')">우상향 (증가)</button>
+            <button onclick="checkAnswer('decrease')">우하향 (감소)</button>
+        </div>
+        <div id="feedback"></div>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentBase = 0;
+
+        // 새로운 문제 생성
+        function nextQuestion() {
+            // 0.1 ~ 5.0 사이의 랜덤한 밑(base) 생성
+            currentBase = (Math.random() * (5 - 0.1) + 0.1).toFixed(1);
+            if (currentBase == 1.0) currentBase = 2.0; // 1은 제외
+
+            document.getElementById('formula').innerHTML = `y = ${currentBase}<sup>x</sup>`;
+            document.getElementById('feedback').innerText = "";
+        }
+
+        // 정답 체크
+        function checkAnswer(choice) {
+            const isIncrease = currentBase > 1;
+            const correct = (isIncrease && choice === 'increase') || (!isIncrease && choice === 'decrease');
+
+            if (correct) {
+                score += 10;
+                document.getElementById('feedback').innerText = "정답입니다! 🎉";
+                document.getElementById('feedback').style.color = "green";
+            } else {
+                score = Math.max(0, score - 5);
+                document.getElementById('feedback').innerText = `틀렸어요! (a=${currentBase})`;
+                document.getElementById('feedback').style.color = "red";
+            }
+
+            document.getElementById('score').innerText = `점수: ${score}`;
+            setTimeout(nextQuestion, 1000); // 1초 뒤 다음 문제
+        }
+
+        // 게임 시작
+        nextQuestion();
+    </script>
+
+</body>
+
+</html>

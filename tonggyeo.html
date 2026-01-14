@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <title>확통: 독립시행의 법칙</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        #game-card {
+            background: #34495e;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            width: 400px;
+        }
+
+        .chips {
+            font-size: 1.5rem;
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .scenario {
+            background: #2c3e50;
+            border: 2px solid #3498db;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .prob-info {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            margin: 10px 0;
+        }
+
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .high {
+            background: #27ae60;
+        }
+
+        .low {
+            background: #c0392b;
+        }
+
+        button:hover {
+            opacity: 0.8;
+            transform: translateY(-2px);
+        }
+
+        #log {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #bdc3c7;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="index.html"
+        style="position:fixed; top:20px; left:20px; color:white; text-decoration:none; background:rgba(255,255,255,0.2); padding:8px 16px; border-radius:20px; font-weight:bold; z-index:999;">🏠
+        HOME</a>
+
+    <div id="game-card">
+        <div class="chips">내 자산: <span id="balance">1000</span>💰</div>
+
+        <div class="scenario">
+            <p style="margin-top:0;">독립시행 상황</p>
+            <div class="prob-info">
+                한 번의 성공 확률 $p = <span id="prob-p" class="highlight">0.5</span>$<br>
+                총 시행 횟수 $n = <span id="prob-n" class="highlight">10</span>$번
+            </div>
+            <hr style="border:0.5px solid #455a64">
+            <p>성공 횟수가 <b><span id="target-k">5</span>번 이상</b>일 확률은?</p>
+        </div>
+
+        <div class="button-group">
+            <button class="high" onclick="bet('high')">50% 이상 (Up)</button>
+            <button class="low" onclick="bet('low')">50% 미만 (Down)</button>
+        </div>
+
+        <div id="log">신중하게 베팅하세요!</div>
+    </div>
+
+    <script>
+        let balance = 1000;
+        let currentP, currentN, currentK, winProb;
+
+        function factorial(n) {
+            if (n === 0 || n === 1) return 1;
+            let res = 1;
+            for (let i = 2; i <= n; i++) res *= i;
+            return res;
+        }
+
+        function nCr(n, r) {
+            return factorial(n) / (factorial(r) * factorial(n - r));
+        }
+
+        // 독립시행의 확률 합계 계산 (k번 이상 성공할 확률)
+        function calculateWinProb(n, p, targetK) {
+            let totalP = 0;
+            for (let i = targetK; i <= n; i++) {
+                totalP += nCr(n, i) * Math.pow(p, i) * Math.pow(1 - p, n - i);
+            }
+            return totalP;
+        }
+
+        function nextRound() {
+            currentN = Math.floor(Math.random() * 5) + 4; // n: 4~8 (계산 편의상 작은수)
+            currentP = parseFloat((Math.random() * 0.6 + 0.2).toFixed(1)); // p: 0.2~0.8
+            currentK = Math.floor(Math.random() * (currentN - 1)) + 1; // k: 1 ~ n-1
+
+            winProb = calculateWinProb(currentN, currentP, currentK);
+
+            document.getElementById('prob-p').innerText = currentP;
+            document.getElementById('prob-n').innerText = currentN;
+            document.getElementById('target-k').innerText = currentK;
+            document.getElementById('log').innerText = "결과 대기 중...";
+        }
+
+        function bet(choice) {
+            const isHigh = winProb >= 0.5;
+            const won = (choice === 'high' && isHigh) || (choice === 'low' && !isHigh);
+
+            if (won) {
+                balance += 200;
+                document.getElementById('log').innerText = `정답! (실제 확률: ${(winProb * 100).toFixed(1)}%)`;
+                document.getElementById('log').style.color = "#27ae60";
+            } else {
+                balance -= 200;
+                document.getElementById('log').innerText = `실패! (실제 확률: ${(winProb * 100).toFixed(1)}%)`;
+                document.getElementById('log').style.color = "#e74c3c";
+            }
+
+            document.getElementById('balance').innerText = balance;
+            if (balance <= 0) {
+                alert("파산했습니다! 게임을 재시작합니다.");
+                balance = 1000;
+                document.getElementById('balance').innerText = balance;
+            }
+            setTimeout(nextRound, 1500);
+        }
+
+        nextRound();
+    </script>
+
+</body>
+
+</html>
